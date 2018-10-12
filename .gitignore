@@ -41,3 +41,4 @@ project.lock.json
 
 #config file
 App.config
+appsettings.json
