@@ -1,0 +1,18 @@
+﻿@model HRMasterASP.Models.Company
+
+@{
+    ViewBag.Title = "Company";
+}
+
+<div class="row page-box">
+    <h1>@Model.Name</h1>
+    <div>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-primary" })
+        @using (Html.BeginForm("Delete", "JobOffer", new { Model.Id }, FormMethod.Post, null, new { style = "display:inline;" }))
+        {
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-danger">Delete</button>
+        }
+    </div>
+    @Html.ActionLink("Go back to Companies list", "Index", "Companies", null, new { @class = "btn btn-primary" })
+</div>
