@@ -1,0 +1,69 @@
+﻿@model HRMasterASP.Models.JobOfferCreateView
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="row page-box">
+    <div class="col-sm-12">
+        <h2>Now Job Offer</h2>
+        @using (Html.BeginForm("Create"))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                @Html.LabelFor(m => m.JobTitle)
+                @Html.EditorFor(m => m.JobTitle, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.JobTitle, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Company)
+                @Html.DropDownListFor(m => m.CompanyId,
+                    Model.Companies.Select(c => new SelectListItem {Text =c.Name, Value = c.Id.ToString() }),
+                    new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.CompanyId, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Location)
+                @Html.EditorFor(m => m.Location, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.Location, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.SalaryFrom, "Salary")
+                <div class="input-group">
+                    <span class="input-group-addon">PLN</span>
+                    @Html.EditorFor(m => m.SalaryFrom, new { htmlAttributes = new { @class = "form-control", placeholder = "From" } })
+                    <span class="input-group-addon">.00</span>
+                </div>
+                @Html.ValidationMessageFor(m => m.SalaryFrom, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.SalaryTo, "Salary")
+                <div class="input-group">
+                    <span class="input-group-addon">PLN</span>
+                    @Html.EditorFor(m => m.SalaryTo, new { htmlAttributes = new { @class = "form-control", placeholder = "To" } })
+                    <span class="input-group-addon">.00</span>
+                </div>
+                @Html.ValidationMessageFor(m => m.SalaryTo, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ValidUntil)
+                <div class="input-group">
+                    @Html.EditorFor(m => m.ValidUntil, new { htmlAttributes = new { @class = "form-control", type = "Date" } })
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+                @Html.ValidationMessageFor(m => m.ValidUntil, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Description)
+                @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder ="Enter description" })
+                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        }
+    </div>
+</div>
+

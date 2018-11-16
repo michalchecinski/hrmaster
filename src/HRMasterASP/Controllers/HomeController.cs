@@ -14,12 +14,14 @@ namespace HRMasterASP.Controllers
         {
             return View();
         }
+        [Route("Home/aboutx")]
 
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
 
             return View();
+ 
         }
 
         public IActionResult Contact()
