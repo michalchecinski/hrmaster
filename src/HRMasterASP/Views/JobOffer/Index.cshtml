@@ -1,0 +1,44 @@
+﻿@model IEnumerable<JobOffer>
+
+<div class="row page-box">
+    <div class="col-sm-12">
+        <h2>Job Offer list</h2>
+
+        @using (Html.BeginForm("Index", "JobOffer", FormMethod.Get))
+        {
+            <div class="input-group col-md-12" style="margin-bottom: 14px">
+                <input type="text" class="form-control" placeholder="Search by offer title.." 
+                       name="search" id="search" />
+                <span class="input-group-btn">
+                    <button class="btn btn-info" type="submit">
+                        <i class="glyphicon glyphicon-search"></i>
+                    </button>
+                </span>
+            </div>
+        }
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Job Title</th>
+                    <th scope="col">Company</th>
+                    <th scope="col">Location</th>
+                    <th scope="col">Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var offer in Model.OrderBy(o => o.Created))
+                {
+                    <tr>
+                        <td>@Html.ActionLink(offer.JobTitle, "Details", new { id = offer.Id })</td>
+                        <td>@offer.Company.Name</td>
+                        <td>@offer.Location</td>
+                        <td>@offer.Created</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+            @Html.ActionLink("Create job offer", "Create", "JobOffer", null, new {@class="btn btn-primary" })
+    </div>
+</div>
+
+
