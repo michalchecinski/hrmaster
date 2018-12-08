@@ -1,19 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using HRMasterASP.EntityFramework;
 using HRMasterASP.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRMasterASP.Controllers
 {
     public class JobApplicationController : Controller
     {
-        // GET: JobApplication/Details/5
-        public ActionResult Details(int id)
+        private readonly DataContext _context;
+
+        public JobApplicationController(DataContext context)
         {
-            var modelView = new JobApplication();
+            _context = context;
+        }
+
+        // GET: JobApplication/Details/5
+        public async Task<ActionResult> Details(int id)
+        {
+            var modelView = await jobApplicationByIdAsync(id);
+            if(modelView == null)
+            {
+                return NotFound();
+            }
             return View(modelView);
         }
 
@@ -29,64 +43,70 @@ namespace HRMasterASP.Controllers
         // POST: JobApplication/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(JobApplicationCreateView jobApplication)
+        public async Task<ActionResult> Create(JobApplicationCreateView model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                // TODO: Add insert logic here
+                return View(model);
+            }
 
-                return RedirectToAction("Details", "JobOffer", new { id = jobApplication.OfferId });
-            }
-            catch
+            var jobApplication = new JobApplication()
             {
-                return View();
-            }
+                OfferId = model.OfferId,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                PhoneNumber = model.PhoneNumber,
+                EmailAddress = model.EmailAddress,
+                ContactAgreement = model.ContactAgreement,
+                CvUrl = model.CvUrl,
+                DateOfBirth = model.DateOfBirth,
+                Description = model.Description
+            };
+
+            _context.JobApplications.Add(jobApplication);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", "JobOffer", new { id = jobApplication.OfferId });
         }
 
         // GET: JobApplication/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id)
         {
-            return View();
+            return View(await jobApplicationByIdAsync(id));
         }
 
         // POST: JobApplication/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int? id, JobApplication model)
         {
-            try
+            if(id == null)
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Details));
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: JobApplication/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
+            return RedirectToAction(nameof(Details), new { model.Id });
         }
 
         // POST: JobApplication/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int? id)
         {
-            try
+            if (id == null)
             {
-                // TODO: Add delete logic here
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var jobApplication = await _context.JobApplications.FirstOrDefaultAsync(x => x.Id == id);
+            _context.JobApplications.Remove(jobApplication);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", "JobOffer", new { id = jobApplication.OfferId });
+        }
 
-                return RedirectToAction("Details", "JobOffer", new { id = 0 });
-            }
-            catch
-            {
-                return View();
-            }
+        private async Task<JobApplication> jobApplicationByIdAsync(int id)
+        {
+            return await _context.JobApplications.FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }
