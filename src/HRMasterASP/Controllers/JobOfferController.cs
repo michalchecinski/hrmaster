@@ -1,73 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using HRMasterASP.Models;
-using HRMasterASP.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using HRMasterASP.EntityFramework;
+using HRMasterASP.Models;
+using System.Net;
 
 namespace HRMasterASP.Controllers
 {
     [Route("[controller]/[action]")]
     public class JobOfferController : Controller
     {
-        private static List<Company> _companies = new List<Company>
-        {
-            new Company() { Id = 1, Name = "Predica"},
-            new Company() { Id = 2, Name = "Microsoft"},
-            new Company() { Id = 3, Name = "GitHub"}
-        };
+        private readonly DataContext _context;
 
-        private static List<JobOffer> _jobOffers = new List<JobOffer>
+        public JobOfferController(DataContext context)
         {
-            new JobOffer{
-                Id =1,
-                JobTitle = "Backend Developer",
-                Company = _companies.FirstOrDefault(c => c.Name =="Predica"),
-                Created = DateTime.Now.AddDays(-2),
-                Description = "Backend C# developer with intrests about IoT solutions. The main task would be building API which expose data from phisical devices. Description need to have at least 100 characters so I am adding some. In test case I reccomend you to use Lorem Impsum.",
-                Location = "Poland",
-                SalaryFrom = 2000,
-                SalaryTo = 10000,
-                ValidUntil = DateTime.Now.AddDays(20)
-            },
-            new JobOffer{
-                Id =2,
-                JobTitle = "Frontend Developer",
-                Company = _companies.FirstOrDefault(c => c.Name =="Microsoft"),
-                Created = DateTime.Now.AddDays(-2),
-                Description = "Developing Office 365 front end interface. Working with SharePoint and graph API. Connecting with AAD and building ML for Mailbox smart assistant. Description need to have at least 100 characters so I am adding some. In test case I reccomend you to use Lorem Impsum.",
-                Location = "Poland",
-                SalaryFrom = 2000,
-                SalaryTo = 10000,
-                ValidUntil = DateTime.Now.AddDays(20)
+            _context = context;
+            foreach (var offer in _context.JobOffers)
+            {
+                offer.Company = _context.Companies.FirstOrDefault(x => x.Id == offer.CompanyId);
             }
-        };
+        }
 
         [HttpGet]
-        public IActionResult Index([FromQuery(Name = "search")] string searchString)
+        public async Task<IActionResult> Index([FromQuery(Name = "search")] string searchString)
         {
-            if (String.IsNullOrEmpty(searchString))
-                return View(_jobOffers);
+            var jobOffers = await _context.JobOffers.ToListAsync();
 
-            List<JobOffer> searchResult = _jobOffers.FindAll(o => o.JobTitle.Contains(searchString));
+            if (String.IsNullOrEmpty(searchString))
+                return View(jobOffers);
+
+            List<JobOffer> searchResult = jobOffers.FindAll(o => o.JobTitle.Contains(searchString));
             return View(searchResult);
         }
-        public ActionResult Edit(int? id)
+
+        [HttpPost]
+        public async Task<ActionResult> Edit(int? id, JobOffer jobOffer)
         {
             if (id == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            var offer = _jobOffers.Find(j => j.Id == id);
-            if (offer == null) return new HttpStatusCodeResult(HttpStatusCode.NotFound);
-            return View(offer);
+            if (id != jobOffer.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(jobOffer);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.JobOffers.Any(x => x.Id == jobOffer.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(jobOffer);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(JobOffer model)
         {
             if (!ModelState.IsValid) return View();
-            var offer = _jobOffers.Find(j => j.Id == model.Id);
+            var offer = await _context.JobOffers.FirstOrDefaultAsync(j => j.Id == model.Id);
             offer.JobTitle = model.JobTitle;
             return RedirectToAction("Details", new { id = model.Id });
         }
@@ -75,15 +82,18 @@ namespace HRMasterASP.Controllers
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
+            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            _jobOffers.RemoveAll(j => j.Id == id);
+            }
+            _context.JobOffers.Remove(await _context.JobOffers.FirstOrDefaultAsync(x => x.Id == id));
             return RedirectToAction("Index");
         }
+        [HttpGet]
         public async Task<ActionResult> Create()
         {
             var model = new JobOfferCreateView
             {
-                Companies = _companies
+                Companies = await _context.Companies.ToListAsync()
             };
             return View(model);
         }
@@ -93,29 +103,28 @@ namespace HRMasterASP.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model.Companies = _companies;
+                model.Companies = await _context.Companies.ToListAsync();
                 return View(model);
             }
-            var id = _jobOffers.Max(j => j.Id) + 1;
-            _jobOffers.Add( new JobOffer
-                {
-                    Id = id,
-                    CompanyId = model.CompanyId,
-                    Company = _companies.FirstOrDefault(c => c.Id == model.CompanyId),
-                    Description = model.Description,
-                    JobTitle = model.JobTitle,
-                    Location = model.Location,
-                    SalaryFrom = model.SalaryFrom,
-                    SalaryTo = model.SalaryTo,
-                    ValidUntil = model.ValidUntil,
-                    Created = DateTime.Now
-                }
-            );
+            _context.JobOffers.Add(new JobOffer
+            {
+                CompanyId = model.CompanyId,
+                Company = _context.Companies.FirstOrDefault(c => c.Id == model.CompanyId),
+                Description = model.Description,
+                JobTitle = model.JobTitle,
+                Location = model.Location,
+                SalaryFrom = model.SalaryFrom,
+                SalaryTo = model.SalaryTo,
+                ValidUntil = model.ValidUntil,
+                Created = DateTime.Now
+            });
+            await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
-        public IActionResult Details(int id)
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
         {
-            var offer = _jobOffers.FirstOrDefault(o => o.Id == id);
+            var offer = await _context.JobOffers.FirstOrDefaultAsync(o => o.Id == id);
             return View(offer);
         }
 
