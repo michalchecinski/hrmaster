@@ -22,6 +22,7 @@ namespace HRMasterASP.Controllers
             foreach (var offer in _context.JobOffers)
             {
                 offer.Company = _context.Companies.FirstOrDefault(x => x.Id == offer.CompanyId);
+                offer.JobApplications = _context.JobApplications.Where(x => x.OfferId == offer.Id).ToList();
             }
         }
 
@@ -78,7 +79,9 @@ namespace HRMasterASP.Controllers
             offer.JobTitle = model.JobTitle;
             return RedirectToAction("Details", new { id = model.Id });
         }
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
@@ -86,6 +89,7 @@ namespace HRMasterASP.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             _context.JobOffers.Remove(await _context.JobOffers.FirstOrDefaultAsync(x => x.Id == id));
+            await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
         [HttpGet]
