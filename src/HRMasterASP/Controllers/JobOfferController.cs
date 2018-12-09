@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HRMasterASP.EntityFramework;
 using HRMasterASP.Models;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRMasterASP.Controllers
 {
@@ -26,6 +27,7 @@ namespace HRMasterASP.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery(Name = "search")] string searchString)
         {

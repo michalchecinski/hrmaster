@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using HRMasterASP.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HRMasterASP.Controllers
 {
@@ -24,6 +25,7 @@ namespace HRMasterASP.Controllers
  
         }
 
+        [Authorize]
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";
