@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HRMasterASP.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("[controller]/[action]")]
     public class JobOfferController : Controller
     {

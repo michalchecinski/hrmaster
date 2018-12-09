@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRMasterASP.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class JobApplicationController : Controller
     {
         private readonly DataContext _context;

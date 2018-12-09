@@ -10,6 +10,7 @@ using HRMasterASP.Models;
 
 namespace HRMasterASP.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class CompaniesController : Controller
     {
         private readonly DataContext _context;
