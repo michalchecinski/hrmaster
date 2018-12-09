@@ -46,17 +46,21 @@
             }
             <div>
                 @Html.ActionLink("Apply Now", "Create", "JobApplication", new { id = Model.Id, jobTitle = Model.JobTitle }, new { @class = "btn btn-primary" })
+                
+                @if ((bool)ViewData["IsAdmin"] == true)
+                {
                 @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-primary" })
                 @using (Html.BeginForm("Delete", "JobOffer", new { Model.Id }, FormMethod.Post, null, new { style = "display:inline;" }))
                 {
                     @Html.AntiForgeryToken()
                     <button type="submit" class="btn btn-danger">Delete</button>
                 }
+                }
             </div>
         </div>
     </div>
 </div>
-@if(Model.JobApplications != null && Model.JobApplications.Count > 0)
+@if(Model.JobApplications != null && Model.JobApplications.Count > 0 && (bool)ViewData["IsAdmin"] == true)
 {
 <div class="row page-box">
     <table class="table table-striped table-hover">

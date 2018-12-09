@@ -66,5 +66,11 @@ namespace HRMasterASP.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public IActionResult NotAllowed()
+        {
+            return View();
+        }
     }
 }

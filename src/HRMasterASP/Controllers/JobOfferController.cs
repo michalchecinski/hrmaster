@@ -9,6 +9,8 @@ using HRMasterASP.EntityFramework;
 using HRMasterASP.Models;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
+using HRMasterASP.Helpers;
+using Microsoft.Extensions.Configuration;
 
 namespace HRMasterASP.Controllers
 {
@@ -18,8 +20,14 @@ namespace HRMasterASP.Controllers
     {
         private readonly DataContext _context;
 
-        public JobOfferController(DataContext context)
+        private IConfiguration _configuration;
+        private AppSettings AppSettings { get; set; }
+
+        public JobOfferController(DataContext context, IConfiguration Configuration)
         {
+            _configuration = Configuration;
+            AppSettings = _configuration.GetSection("AppSettings").Get<AppSettings>();
+
             _context = context;
             foreach (var offer in _context.JobOffers)
             {
@@ -28,7 +36,6 @@ namespace HRMasterASP.Controllers
             }
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery(Name = "search")] string searchString)
         {
@@ -41,9 +48,14 @@ namespace HRMasterASP.Controllers
             return View(searchResult);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> Edit(int? id, JobOffer jobOffer)
         {
+            if(!await isUserAdminAsync())
+            {
+                return RedirectToAction("NotAllowed", "Session");
+            }
             if (id == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             if (id != jobOffer.Id)
@@ -73,20 +85,34 @@ namespace HRMasterASP.Controllers
             }
             return View(jobOffer);
         }
+
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(JobOffer model)
         {
-            if (!ModelState.IsValid) return View();
+            if (!await isUserAdminAsync())
+            {
+                return RedirectToAction("NotAllowed", "Session");
+            }
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             var offer = await _context.JobOffers.FirstOrDefaultAsync(j => j.Id == model.Id);
             offer.JobTitle = model.JobTitle;
             return RedirectToAction("Details", new { id = model.Id });
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int? id)
         {
+            if (!await isUserAdminAsync())
+            {
+                return RedirectToAction("NotAllowed", "Session");
+            }
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -95,19 +121,31 @@ namespace HRMasterASP.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
+
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult> Create()
         {
+            if (!await isUserAdminAsync())
+            {
+                return RedirectToAction("NotAllowed", "Session");
+            }
             var model = new JobOfferCreateView
             {
                 Companies = await _context.Companies.ToListAsync()
             };
             return View(model);
         }
+
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(JobOfferCreateView model)
         {
+            if (!await isUserAdminAsync())
+            {
+                return RedirectToAction("NotAllowed", "Session");
+            }
             if (!ModelState.IsValid)
             {
                 model.Companies = await _context.Companies.ToListAsync();
@@ -128,11 +166,22 @@ namespace HRMasterASP.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
+
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
+            ViewData["IsAdmin"] = await isUserAdminAsync();
             var offer = await _context.JobOffers.FirstOrDefaultAsync(o => o.Id == id);
             return View(offer);
+        }
+
+        private async Task<bool> isUserAdminAsync()
+        {
+            AADGraph graph = new AADGraph(AppSettings);
+            string groupName = "Admins";
+            string groupId = AppSettings.AADGroups.FirstOrDefault(g => String.Compare(g.Name, groupName) == 0).Id;
+            return await graph.IsUserInGroup(User.Claims, groupId);
         }
 
     }

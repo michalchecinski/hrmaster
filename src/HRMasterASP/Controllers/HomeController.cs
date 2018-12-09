@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using HRMasterASP.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
+using HRMasterASP.Helpers;
 
 namespace HRMasterASP.Controllers
 {
@@ -23,12 +25,13 @@ namespace HRMasterASP.Controllers
             ViewData["Message"] = "Your application description page.";
 
             return View();
- 
+
         }
 
         [Authorize]
-        public IActionResult Contact()
+        public async Task<IActionResult> Contact()
         {
+
             ViewData["Message"] = "Your contact page.";
 
             return View();
