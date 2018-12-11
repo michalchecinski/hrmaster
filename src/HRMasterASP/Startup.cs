@@ -57,7 +57,7 @@ namespace HRMasterASP
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            var connection = @"Server=(localdb)\mssqllocaldb;Database=HRMaster;Trusted_Connection=True;";
+            var connection = Configuration.GetConnectionString("DBConnection");
 
             services.AddDbContext<DataContext>(options => options.UseSqlServer(connection));
 
