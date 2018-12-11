@@ -7,7 +7,7 @@
 <div class="row page-box">
     <div class="col-sm-12">
         <h2>Apply for: @Model.JobOfferName</h2>
-        @using (Html.BeginForm("Create"))
+        @using (Html.BeginForm("Create", "JobApplication", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
             <div class="form-group">
@@ -31,9 +31,9 @@
                 @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.CvUrl)
-                @Html.TextAreaFor(m => m.CvUrl, new { @class = "form-control" })
-                @Html.ValidationMessageFor(m => m.CvUrl, "", new { @class = "text-danger" })
+                @Html.LabelFor(m => m.CvFile)
+                <input type="file" id="CvFile" name="CvFile" />
+                @Html.ValidationMessageFor(m => m.CvFile, "", new { @class = "text-danger" })
             </div>
             <div class="form-group">
                 @Html.LabelFor(m => m.DateOfBirth)
@@ -51,6 +51,7 @@
                 @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
             </div>
             @Html.HiddenFor(m => m.OfferId)
+            @Html.HiddenFor(m => m.JobOfferName)
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Create</button>
             </div>
