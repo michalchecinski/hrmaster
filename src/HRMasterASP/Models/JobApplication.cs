@@ -29,7 +29,6 @@ namespace HRMasterASP.Models
         public string EmailAddress { get; set; }
         public bool ContactAgreement { get; set; }
 
-        [Required]
         [Display(Name = "CV URL")]
         public string CvUrl { get; set; }
 
