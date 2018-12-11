@@ -1,0 +1,59 @@
+﻿@model HRMasterASP.Models.JobApplication
+
+@{ ViewBag.Title = "Job Application";}
+
+<div class="row page-box">
+    <h1>@Model.FirstName @Model.LastName</h1>
+    <div class="col-sm-8">
+        <div class="offer-details">
+            <div>
+                <label>First Name:</label>
+                <span>@Model.FirstName</span>
+            </div>
+            <div>
+                <label>Last Name:</label>
+                <span>@Model.LastName</span>
+            </div>
+            <div>
+                <label>Email Address</label>
+                <span>@Model.EmailAddress</span>
+            </div>
+            <div>
+                <label>Phone Number:</label>
+                <span>@Model.PhoneNumber</span>
+            </div>
+            <div>
+                <label>CV Url:</label>
+                <span><a href="@Model.CvUrl">@Model.CvUrl</a></span>
+            </div>
+            <div>
+                <label>Date Of Birth:</label>
+                <span>@Model.DateOfBirth</span>
+            </div>
+
+            <div>
+                <label>Contact agreement:</label>
+                <span>@Model.ContactAgreement</span>
+            </div>
+
+            @if (Model.Description != null)
+            {
+                <div>
+                    <label>Description:</label>
+                    <span>@Model.Description </span>
+                </div>
+            }
+        </div>
+        <div class="col-sm-4">
+            <div>
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-primary" })
+                @using (Html.BeginForm("Delete", "JobApplication", new { id = Model.Id }, FormMethod.Post, null, new { style = "display:inline;" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                }
+            </div>
+        </div>
+    </div>
+    @Html.ActionLink("Go back to Job Offer", "Details", "JobOffer", new { id = Model.OfferId }, new { @class = "btn btn-primary" })
+</div>

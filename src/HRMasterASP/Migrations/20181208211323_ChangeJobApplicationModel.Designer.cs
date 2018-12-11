@@ -4,14 +4,16 @@ using HRMasterASP.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HRMasterASP.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20181208211323_ChangeJobApplicationModel")]
+    partial class ChangeJobApplicationModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +42,8 @@ namespace HRMasterASP.Migrations
 
                     b.Property<bool>("ContactAgreement");
 
-                    b.Property<string>("CvUrl");
+                    b.Property<string>("CvUrl")
+                        .IsRequired();
 
                     b.Property<DateTime>("DateOfBirth");
 

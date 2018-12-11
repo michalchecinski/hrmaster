@@ -1,6 +1,6 @@
 ﻿@model JobOffer
 
-@{    ViewBag.Title = "Offer";}
+@{ ViewBag.Title = "Offer";}
 
 <div class="row page-box">
     <h1>@Model.JobTitle</h1>
@@ -19,13 +19,15 @@
                 <label>Location:</label>
                 <span>@Model.Location</span>
             </div>
-            @if (Model.SalaryFrom.HasValue){
+            @if (Model.SalaryFrom.HasValue)
+            {
                 <div>
                     <label>Salary from:</label>
                     <span>@Model.SalaryFrom  (PLN)</span>
                 </div>
             }
-            @if (Model.SalaryTo.HasValue){
+            @if (Model.SalaryTo.HasValue)
+            {
                 <div>
                     <label>Salary to:</label>
                     <span>@Model.SalaryTo</span>
@@ -35,21 +37,51 @@
                 <label>Created:</label>
                 <span>@Model.Created</span>
             </div>
-            @if (Model.ValidUntil.HasValue){
+            @if (Model.ValidUntil.HasValue)
+            {
                 <div>
                     <label>Valid:</label>
                     <span>@Model.ValidUntil.Value.Subtract(DateTime.Now).Days days (@Model.ValidUntil)</span>
                 </div>
             }
             <div>
+                @Html.ActionLink("Apply Now", "Create", "JobApplication", new { id = Model.Id, jobTitle = Model.JobTitle }, new { @class = "btn btn-primary" })
+                
+                @if ((bool)ViewData["IsAdmin"] == true)
+                {
                 @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-primary" })
-                @using (Html.BeginForm("Delete", "JobOffer", new { Model.Id }, FormMethod.Post, null, new {style = "display:inline;" }))
+                @using (Html.BeginForm("Delete", "JobOffer", new { Model.Id }, FormMethod.Post, null, new { style = "display:inline;" }))
                 {
                     @Html.AntiForgeryToken()
                     <button type="submit" class="btn btn-danger">Delete</button>
                 }
+                }
             </div>
         </div>
     </div>
-    @Html.ActionLink("Go back to Job Offers", "Index", "JobOffer", null, new { @class = "btn btn-primary" })
 </div>
+@if(Model.JobApplications != null && Model.JobApplications.Count > 0 && (bool)ViewData["IsAdmin"] == true)
+{
+<div class="row page-box">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var application in Model.JobApplications)
+            {
+                <tr>
+                    <td>@Html.ActionLink($"{application.FirstName} {application.LastName}", "Details", "JobApplication", new { id = application.Id })</td>
+                    <td>@application.EmailAddress</td>
+                    <td>@application.PhoneNumber</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+}
+@Html.ActionLink("Go back to Job Offers", "Index", "JobOffer", null, new { @class = "btn btn-primary" })

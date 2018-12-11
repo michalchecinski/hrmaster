@@ -1,12 +1,12 @@
 ﻿@model HRMasterASP.Models.JobOfferCreateView
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create job offer";
 }
 
 <div class="row page-box">
     <div class="col-sm-12">
-        <h2>Now Job Offer</h2>
+        <h2>New Job Offer</h2>
         @using (Html.BeginForm("Create"))
         {
             @Html.AntiForgeryToken()

@@ -5,9 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using HRMasterASP.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
+using HRMasterASP.Helpers;
 
 namespace HRMasterASP.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -21,11 +25,13 @@ namespace HRMasterASP.Controllers
             ViewData["Message"] = "Your application description page.";
 
             return View();
- 
+
         }
 
-        public IActionResult Contact()
+        [Authorize]
+        public async Task<IActionResult> Contact()
         {
+
             ViewData["Message"] = "Your contact page.";
 
             return View();
