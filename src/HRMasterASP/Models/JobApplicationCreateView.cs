@@ -14,6 +14,7 @@ namespace HRMasterASP.Models
 
         [Required]
         [Display(Name = "CV File")]
+        [FileExtensions(Extensions = (".pdf,.doc,.docx"), ErrorMessage = "Please select a pdf or a Word file.")]
         public IFormFile CvFile { get; set; }
     }
 }
