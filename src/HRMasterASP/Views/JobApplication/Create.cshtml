@@ -27,7 +27,7 @@
             </div>
             <div class="form-group">
                 @Html.LabelFor(m => m.PhoneNumber)
-                @Html.TextAreaFor(m => m.PhoneNumber, new { @class = "form-control" })
+                @Html.EditorFor(m => m.PhoneNumber, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
             </div>
             <div class="form-group">
@@ -49,6 +49,11 @@
                 @Html.LabelFor(m => m.Description)
                 @Html.TextAreaFor(m => m.Description, new { @class = "form-control" })
                 @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.CheckBoxFor(m => m.ContactAgreement)
+                @Html.LabelFor(m => m.ContactAgreement)
+                @Html.ValidationMessageFor(m => m.ContactAgreement, "", new { @class = "text-danger" })
             </div>
             @Html.HiddenFor(m => m.OfferId)
             @Html.HiddenFor(m => m.JobOfferName)

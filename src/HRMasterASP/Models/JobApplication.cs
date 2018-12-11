@@ -10,6 +10,8 @@ namespace HRMasterASP.Models
     public class JobApplication
     {
         public int Id { get; set; }
+
+        [Required]
         public int OfferId { get; set; }
 
         [Required]
@@ -25,8 +27,12 @@ namespace HRMasterASP.Models
         public string PhoneNumber { get; set; }
 
         [Required]
+        [EmailAddress]
         [Display(Name = "Contact Email Address")]
         public string EmailAddress { get; set; }
+
+        [Required]
+        [Display(Name = "I agree to contact for recruitment purposes")]
         public bool ContactAgreement { get; set; }
 
         [Display(Name = "CV URL")]

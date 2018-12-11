@@ -5,7 +5,7 @@
 <div class="row page-box">
     <h1>@Model.FirstName @Model.LastName</h1>
     <div class="col-sm-8">
-       <div class="offer-details">
+        <div class="offer-details">
             <div>
                 <label>First Name:</label>
                 <span>@Model.FirstName</span>
@@ -24,11 +24,16 @@
             </div>
             <div>
                 <label>CV Url:</label>
-                <span><a href="@Model.CvUrl" >@Model.CvUrl</a></span>
+                <span><a href="@Model.CvUrl">@Model.CvUrl</a></span>
             </div>
             <div>
                 <label>Date Of Birth:</label>
                 <span>@Model.DateOfBirth</span>
+            </div>
+
+            <div>
+                <label>Contact agreement:</label>
+                <span>@Model.ContactAgreement</span>
             </div>
 
             @if (Model.Description != null)
