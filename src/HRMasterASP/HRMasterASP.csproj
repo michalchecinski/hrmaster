@@ -4,9 +4,14 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <ApplicationIcon />
     <Win32Resource />
+    <UserSecretsId>182c6046-bf72-4fc8-97f2-98ce12db0841</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\dev\studia\asp\src\HRMasterASP\HRMasterASP.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>C:\dev\studia\asp\src\HRMasterASP\HRMasterASP.xml</DocumentationFile>
   </PropertyGroup>
 
