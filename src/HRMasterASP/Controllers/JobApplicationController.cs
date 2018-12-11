@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace HRMasterASP.Controllers
 {
@@ -16,13 +20,16 @@ namespace HRMasterASP.Controllers
     public class JobApplicationController : Controller
     {
         private readonly DataContext _context;
+        private IConfiguration _configuration;
 
-        public JobApplicationController(DataContext context)
+        public JobApplicationController(DataContext context, IConfiguration Configuration)
         {
+            _configuration = Configuration;
             _context = context;
         }
 
         // GET: JobApplication/Details/5
+        [Authorize]
         public async Task<ActionResult> Details(int id)
         {
             var modelView = await jobApplicationByIdAsync(id);
@@ -34,6 +41,7 @@ namespace HRMasterASP.Controllers
         }
 
         // GET: JobApplication/Create
+        [Authorize]
         public ActionResult Create(int id, string jobTitle)
         {
             var modelView = new JobApplicationCreateView();
@@ -45,6 +53,7 @@ namespace HRMasterASP.Controllers
         // POST: JobApplication/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<ActionResult> Create(JobApplicationCreateView model)
         {
             if (!ModelState.IsValid)
@@ -52,18 +61,9 @@ namespace HRMasterASP.Controllers
                 return View(model);
             }
 
-            var jobApplication = new JobApplication()
-            {
-                OfferId = model.OfferId,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                PhoneNumber = model.PhoneNumber,
-                EmailAddress = model.EmailAddress,
-                ContactAgreement = model.ContactAgreement,
-                CvUrl = model.CvUrl,
-                DateOfBirth = model.DateOfBirth,
-                Description = model.Description
-            };
+            var jobApplication = (JobApplication)model;
+            jobApplication.CvUrl = await UploadFileToBlob(model.CvFile);
+            jobApplication.Id = 0;
 
             _context.JobApplications.Add(jobApplication);
             await _context.SaveChangesAsync();
@@ -73,6 +73,7 @@ namespace HRMasterASP.Controllers
 
         // GET: JobApplication/Edit/5
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult> Edit(int id)
         {
             return View(await jobApplicationByIdAsync(id));
@@ -81,6 +82,7 @@ namespace HRMasterASP.Controllers
         // POST: JobApplication/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Edit(int? id, JobApplication model)
         {
             if(id == null)
@@ -94,6 +96,7 @@ namespace HRMasterASP.Controllers
         // POST: JobApplication/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
@@ -109,6 +112,32 @@ namespace HRMasterASP.Controllers
         private async Task<JobApplication> jobApplicationByIdAsync(int id)
         {
             return await _context.JobApplications.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        private async Task<string> UploadFileToBlob(IFormFile file)
+        {
+            string connectionString = _configuration.GetConnectionString("BlobStorageCV");
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+
+                CloudStorageAccount storageAccount = null;
+                if (CloudStorageAccount.TryParse(connectionString, out storageAccount))
+                {
+                    CloudBlobClient cloudBlobClient = storageAccount.CreateCloudBlobClient();
+
+                    CloudBlobContainer container = cloudBlobClient.GetContainerReference("applications");
+                    await container.CreateIfNotExistsAsync();
+
+                    CloudBlockBlob blockBlob = container.GetBlockBlobReference(file.FileName);
+
+                    // Upload the file
+                    await blockBlob.UploadFromStreamAsync(memoryStream);
+                    return blockBlob.Uri.ToString();
+                }
+            }
+            return null;
         }
     }
 }
