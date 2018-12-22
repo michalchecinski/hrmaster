@@ -43,6 +43,8 @@ project.lock.json
 App.config
 appsettings.json
 appsettings.*.json
+appsettings.Development.json
+appsettings.Release.json
 
 #Publish profiles
 PublishProfiles
