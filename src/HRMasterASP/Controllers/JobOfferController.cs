@@ -167,7 +167,6 @@ namespace HRMasterASP.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
