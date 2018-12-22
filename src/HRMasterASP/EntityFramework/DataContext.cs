@@ -15,8 +15,14 @@ namespace HRMasterASP.EntityFramework
 
         }
 
+        protected DataContext()
+        {
+
+        }
+
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<JobOffer> JobOffers { get; set; }
         public DbSet<Company> Companies { get; set; }
+
     }
 }
