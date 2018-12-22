@@ -28,7 +28,7 @@ namespace HRMasterASP.Controllers
 
 
         [HttpGet]
-        public async Task<IEnumerable<JobOffer>> Index([FromQuery(Name = "search")] string searchString)
+        public async Task<IEnumerable<JobOffer>> Index([FromQuery(Name = "search")] string searchString="")
         {
             var jobOffers = await _context.JobOffers.ToListAsync();
 
