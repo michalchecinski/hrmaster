@@ -28,15 +28,47 @@ namespace HRMasterASP.Controllers
 
 
         [HttpGet]
-        public async Task<IEnumerable<JobOffer>> Index([FromQuery(Name = "search")] string searchString="")
+        public async Task<PagingViewModel<JobOffer>> Index([FromQuery(Name = "search")] string searchString = "", [FromQuery(Name = "pageNo")] int pageNo = -1)
         {
-            var jobOffers = await _context.JobOffers.ToListAsync();
+            var jobOffers = _context.JobOffers;
 
-            if (String.IsNullOrEmpty(searchString))
-                return jobOffers;
+            if (String.IsNullOrEmpty(searchString) && pageNo == -1)
+            {
+                var set = await jobOffers.ToListAsync();
+                return new PagingViewModel<JobOffer>
+                {
+                    Set = set,
+                    TotalPage = 1
+                };
+            }
 
-            List<JobOffer> searchResult = jobOffers.FindAll(o => o.JobTitle.ToLower().Contains(searchString.ToLower()));
-            return searchResult;
+            var searchResult = jobOffers.Where(o => o.JobTitle.ToLower().Contains(searchString.ToLower()));
+
+            if (pageNo == -1)
+            {
+                return new PagingViewModel<JobOffer>
+                {
+                    Set = searchResult.ToList(),
+                    TotalPage = 1
+                };
+            }
+
+            var pageSize = 4;
+
+            var totalRecord = searchResult.Count();
+            var totalPage = (totalRecord / pageSize) + ((totalRecord % pageSize) > 0 ? 1 : 0);
+            var record = await searchResult.OrderBy(x => x.JobTitle)
+                                           .Skip((pageNo - 1) * pageSize)
+                                           .Take(pageSize)
+                                           .ToListAsync();
+
+            var empData = new PagingViewModel<JobOffer>
+            {
+                Set = record,
+                TotalPage = totalPage
+            };
+
+            return empData;
         }
     }
 }
