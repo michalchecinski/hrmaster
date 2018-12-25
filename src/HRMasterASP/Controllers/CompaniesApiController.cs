@@ -12,41 +12,35 @@ namespace HRMasterASP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class JobOfferSearchController : Controller
+    public class CompaniesApiController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public JobOfferSearchController(DataContext context)
+        public CompaniesApiController(DataContext context)
         {
             _context = context;
-            foreach (var offer in _context.JobOffers)
-            {
-                offer.Company = _context.Companies.FirstOrDefault(x => x.Id == offer.CompanyId);
-                offer.JobApplications = _context.JobApplications.Where(x => x.OfferId == offer.Id).ToList();
-            }
         }
 
-
         [HttpGet]
-        public async Task<PagingViewModel<JobOffer>> Index([FromQuery(Name = "search")] string searchString = "", [FromQuery(Name = "pageNo")] int pageNo = -1)
+        public async Task<PagingViewModel<Company>> GetCompanies([FromQuery(Name = "search")] string searchString = "", [FromQuery(Name = "pageNo")] int pageNo = -1)
         {
-            var jobOffers = _context.JobOffers;
+            var companies = _context.Companies;
 
             if (String.IsNullOrEmpty(searchString) && pageNo == -1)
             {
-                var set = await jobOffers.ToListAsync();
-                return new PagingViewModel<JobOffer>
+                var set = await companies.ToListAsync();
+                return new PagingViewModel<Company>
                 {
                     Set = set,
                     TotalPage = 1
                 };
             }
 
-            var searchResult = jobOffers.Where(o => o.JobTitle.ToLower().Contains(searchString.ToLower()));
+            var searchResult = companies.Where(o => o.Name.ToLower().Contains(searchString.ToLower()));
 
             if (pageNo == -1)
             {
-                return new PagingViewModel<JobOffer>
+                return new PagingViewModel<Company>
                 {
                     Set = searchResult.ToList(),
                     TotalPage = 1
@@ -57,12 +51,12 @@ namespace HRMasterASP.Controllers
 
             var totalRecord = searchResult.Count();
             var totalPage = (totalRecord / pageSize) + ((totalRecord % pageSize) > 0 ? 1 : 0);
-            var record = await searchResult.OrderBy(x => x.JobTitle)
+            var record = await searchResult.OrderBy(x => x.Name)
                                            .Skip((pageNo - 1) * pageSize)
                                            .Take(pageSize)
                                            .ToListAsync();
 
-            var empData = new PagingViewModel<JobOffer>
+            var empData = new PagingViewModel<Company>
             {
                 Set = record,
                 TotalPage = totalPage
