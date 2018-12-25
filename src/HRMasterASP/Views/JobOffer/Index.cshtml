@@ -1,5 +1,9 @@
 ﻿@model IEnumerable<JobOffer>
 
+@{
+    ViewBag.Title = "Job offers list";
+}
+
 <div class="row page-box">
     <div class="col-sm-12">
         <h2>Job Offer list</h2>
@@ -8,6 +12,9 @@
             <input type="text" class="form-control" placeholder="Search by offer title.."
                    name="search" id="search" />
             <span class="input-group-btn">
+                <button class="btn btn-danger" type="submit" onclick="clear();" id="clear" style="display: none;">
+                    <i class="glyphicon glyphicon-remove"></i>
+                </button>
                 <button class="btn btn-info" type="submit" onclick="find();">
                     <i class="glyphicon glyphicon-search"></i>
                 </button>
@@ -16,42 +23,120 @@
 
         <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
         <script>
-        var uri = '/api/JobOfferSearch';
+            var uri = '/api/JobOfferApi';
+            var $loading = "<div class='loading'>Please wait...</div>";
+            var currentPage = 1;
+            var totalPage = 1;
+            var query = "";
 
-        $(document).ready(function () {
-            // Send an AJAX request
-            $.getJSON(uri)
-                .done(function (data) {
-                    // On success, 'data' contains a list of products.
-                    $.each(data, function (key, item) {
-                        // Add a list item for the product.
-                        $("#table-body").append(formatItem(item));
+
+            $(document).ready(function () {
+                $('#clear').hide();
+                getAll();
+            })
+
+
+            function formatItem(item) {
+                return '<tr>' +
+                    '<td><a href="/JobOffer/Details?id=' + item.id + '\">' + item.jobTitle + `</a></td>
+                                            <td>`+ item.company.name + `</td>
+                                            <td>`+ item.location + `</td>
+                                            <td>`+ item.created + `</td>
+                                            </tr >`;
+            }
+
+            function find() {
+                $('#table-body').html($loading);
+                query = $('#search').val();
+                currentPage = 1;
+                $('#clear').show();
+                fetchData();
+            }
+
+            function clear() {
+                $('#search').val("");
+                $('#clear').hide();
+                getAll();
+            }
+
+            function getAll() {
+                $('#table-body').html($loading);
+                query = "";
+                currentPage = 1;
+                fetchData();
+            }
+
+            function NextPage() {
+                if (currentPage < totalPage) {
+                    currentPage++;
+                    fetchData();
+                }
+            }
+
+            function PreviousPage() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    fetchData();
+                }
+            }
+
+            function getPage(pageNo) {
+                currentPage = pageNo;
+                fetchData();
+            }
+
+            function fetchData() {
+                var queryUrl = uri + '?search=' + query + '&pageNo=' + currentPage;
+                if (query == "") {
+                    queryUrl = uri + '?pageNo=' + currentPage;
+                }
+                $.getJSON(queryUrl)
+                    .done(function (data) {
+                        totalPage = parseInt(data.totalPage);
+                        $("#table-body").html("");
+                        $.each(data.set, function (key, item) {
+                            $("#table-body").append(formatItem(item));
+                        });
+
+                        pages();
+                    })
+                    .fail(function (jqXHR, textStatus, err) {
+                        $('#table-body').text('Error: ' + err);
                     });
-                });
-        })
+            }
 
-        function formatItem(item) {
-            return '<tr>'+
-                    '<td><a href="/JobOffer/Details?id='+item.id+'\">'+item.jobTitle+`</a></td>
-                    <td>`+item.company.name+`</td>
-                    <td>`+ item.location+`</td>
-                    <td>`+item.created+`</td>
-                    </tr >`;
-        }
+            function pages() {
+                var $pagination = $('<nav/>');
+                var $paginationUl = $('<ul/>').addClass('pagination');
+                $paginationUl.append(`<li class="page-item"  id="previous-page">
+                    <a class= "page-link" href = "#" tabindex = "-1" onclick="PreviousPage();" > Previous</a >
+    </li >`);
 
-        function find() {
-            var query = $('#search').val();
-            $.getJSON(uri + '?search=' + query)
-                .done(function (data) {
-                    $("#table-body").html("");
-                    $.each(data, function (key, item) {
-                        $("#table-body").append(formatItem(item));
-                    });
-                })
-                .fail(function (jqXHR, textStatus, err) {
-                    $('#table-body').text('Error: ' + err);
-                });
-        }
+                if (totalPage > 0) {
+                    for (var i = 1; i <= totalPage; i++) {
+                        var $page = $('<li/>').addClass('page-item' + (i == currentPage) ? "current" : "")
+                        if (i == currentPage) {
+                            $page.html('<a class="page-link" href="#" >' + i + '<span class="sr-only">(current)</span></a>');
+                        }
+                        else {
+                            $page.html('<a class="page-link" href="#" onclick="getPage(' + i + ');">' + i + '</a>');
+                        }
+                        $paginationUl.append($page);
+                    }
+                    $pagination.append($paginationUl);
+                }
+                $paginationUl.append(`<li class="page-item" id="next-page">
+                            <a class= "page-link" href = "#" tabindex = "+1" onclick="NextPage();" > Next</a >
+            </li >`);
+
+                $('#table-body').append($pagination);
+                if (currentPage == 1) {
+                    $('#previous-page').addClass('disabled');
+                }
+                if (currentPage == totalPage) {
+                    $('#next-page').addClass('disabled');
+                }
+            }
         </script>
 
 
@@ -64,8 +149,7 @@
                     <th scope="col">Created</th>
                 </tr>
             </thead>
-            <tbody id="table-body">
-            </tbody>
+            <tbody id="table-body"></tbody>
         </table>
         @Html.ActionLink("Create job offer", "Create", "JobOffer", null, new { @class = "btn btn-primary" })
     </div>
