@@ -1,5 +1,9 @@
 ﻿@model IEnumerable<JobOffer>
 
+@{
+    ViewBag.Title = "Job offers list";
+}
+
 <div class="row page-box">
     <div class="col-sm-12">
         <h2>Job Offer list</h2>
@@ -35,10 +39,10 @@
             function formatItem(item) {
                 return '<tr>' +
                     '<td><a href="/JobOffer/Details?id=' + item.id + '\">' + item.jobTitle + `</a></td>
-                                    <td>`+ item.company.name + `</td>
-                                    <td>`+ item.location + `</td>
-                                    <td>`+ item.created + `</td>
-                                    </tr >`;
+                                            <td>`+ item.company.name + `</td>
+                                            <td>`+ item.location + `</td>
+                                            <td>`+ item.created + `</td>
+                                            </tr >`;
             }
 
             function find() {
@@ -115,15 +119,15 @@
                             $page.html('<a class="page-link" href="#" >' + i + '<span class="sr-only">(current)</span></a>');
                         }
                         else {
-                            $page.html('<a class="page-link" href="#" onclick="getPage('+i+');">' + i + '</a>');
+                            $page.html('<a class="page-link" href="#" onclick="getPage(' + i + ');">' + i + '</a>');
                         }
                         $paginationUl.append($page);
                     }
                     $pagination.append($paginationUl);
                 }
                 $paginationUl.append(`<li class="page-item" id="next-page">
-                    <a class= "page-link" href = "#" tabindex = "+1" onclick="NextPage();" > Next</a >
-    </li >`);
+                            <a class= "page-link" href = "#" tabindex = "+1" onclick="NextPage();" > Next</a >
+            </li >`);
 
                 $('#table-body').append($pagination);
                 if (currentPage == 1) {
