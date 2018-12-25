@@ -13,7 +13,7 @@ using FluentAssertions;
 
 namespace HRMasterUnitTests
 {
-    public class JobOfferSearchControllerTests
+    public class JobOfferApiControllerTests
     {
         [Fact]
         public async Task job_offer_api_get_without_search_string_should_return_all_job_offers()
@@ -60,12 +60,13 @@ namespace HRMasterUnitTests
             // Use a clean instance of the context to run the test
             using (var context = new DataContext(options))
             {
-                var controller = new JobOfferSearchController(context);
+                var controller = new JobOfferApiController(context);
                 var result = await controller.Index();
+                var resultSet = result.Set;
 
-                result.Count().Should().Be(jobOfferList.Count);
-                result.FirstOrDefault().Should().BeOfType<JobOffer>();
-                result.Should().BeEquivalentTo(jobOfferList);
+                resultSet.Count().Should().Be(jobOfferList.Count);
+                resultSet.FirstOrDefault().Should().BeOfType<JobOffer>();
+                resultSet.Should().BeEquivalentTo(jobOfferList);
             }
         }
     }
