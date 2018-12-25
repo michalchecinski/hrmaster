@@ -1,35 +1,146 @@
-﻿@model IEnumerable<HRMasterASP.Models.Company>
+﻿@{
+    ViewBag.Title = "Companies list";
+}
+
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+<script>
+    var uri = '/api/CompaniesApi';
+    var $loading = "<div class='loading'>Please wait...</div>";
+    var currentPage = 1;
+    var totalPage = 1;
+    var query = "";
+
+
+    $(document).ready(function () {
+        $('#clear').hide();
+        getAll();
+    })
+
+
+    function formatItem(item) {
+        return '<tr>' +
+            '<td><a href="/Companies/Details?id=' + item.id + '\">' + item.name + `</a></td>
+                     </tr >`;
+    }
+
+    function find() {
+        $('#table-body').html($loading);
+        query = $('#search').val();
+        currentPage = 1;
+        $('#clear').show();
+        fetchData();
+    }
+
+    function clear() {
+        $('#search').val("");
+        $('#clear').hide();
+        getAll();
+    }
+
+    function getAll() {
+        $('#table-body').html($loading);
+        query = "";
+        currentPage = 1;
+        fetchData();
+    }
+
+    function NextPage() {
+        if (currentPage < totalPage) {
+            currentPage++;
+            fetchData();
+        }
+    }
+
+    function PreviousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            fetchData();
+        }
+    }
+
+    function getPage(pageNo) {
+        currentPage = pageNo;
+        fetchData();
+    }
+
+    function fetchData() {
+        var queryUrl = uri + '?search=' + query + '&pageNo=' + currentPage;
+        if (query == "") {
+            queryUrl = uri + '?pageNo=' + currentPage;
+        }
+        $.getJSON(queryUrl)
+            .done(function (data) {
+                totalPage = parseInt(data.totalPage);
+                $("#table-body").html("");
+                $.each(data.set, function (key, item) {
+                    $("#table-body").append(formatItem(item));
+                });
+
+                pages();
+            })
+            .fail(function (jqXHR, textStatus, err) {
+                $('#table-body').text('Error: ' + err);
+            });
+    }
+
+    function pages() {
+        var $pagination = $('<nav/>');
+        var $paginationUl = $('<ul/>').addClass('pagination');
+        $paginationUl.append(`<li class="page-item"  id="previous-page">
+                    <a class= "page-link" href = "#" tabindex = "-1" onclick="PreviousPage();" > Previous</a >
+    </li >`);
+
+        if (totalPage > 0) {
+            for (var i = 1; i <= totalPage; i++) {
+                var $page = $('<li/>').addClass('page-item' + (i == currentPage) ? "current" : "")
+                if (i == currentPage) {
+                    $page.html('<a class="page-link" href="#" >' + i + '<span class="sr-only">(current)</span></a>');
+                }
+                else {
+                    $page.html('<a class="page-link" href="#" onclick="getPage(' + i + ');">' + i + '</a>');
+                }
+                $paginationUl.append($page);
+            }
+            $pagination.append($paginationUl);
+        }
+        $paginationUl.append(`<li class="page-item" id="next-page">
+                    <a class= "page-link" href = "#" tabindex = "+1" onclick="NextPage();" > Next</a >
+    </li >`);
+
+        $('#table-body').append($pagination);
+        if (currentPage == 1) {
+            $('#previous-page').addClass('disabled');
+        }
+        if (currentPage == totalPage) {
+            $('#next-page').addClass('disabled');
+        }
+    }
+</script>
 
 <div class="row page-box">
     <div class="col-sm-12">
         <h2>Companies list</h2>
 
-        @using (Html.BeginForm("Index", "Companies", FormMethod.Get))
-        {
-            <div class="input-group col-md-12" style="margin-bottom: 14px">
-                <input type="text" class="form-control" placeholder="Search by company title.."
-                       name="search" id="search" />
-                <span class="input-group-btn">
-                    <button class="btn btn-info" type="submit">
-                        <i class="glyphicon glyphicon-search"></i>
-                    </button>
-                </span>
-            </div>
-        }
+        <div class="input-group col-md-12" style="margin-bottom: 14px">
+            <input type="text" class="form-control" placeholder="Search by company title.."
+                   name="search" id="search" />
+            <span class="input-group-btn">
+                <button class="btn btn-danger" type="submit" onclick="clear();" id="clear" style="display: none;">
+                    <i class="glyphicon glyphicon-remove"></i>
+                </button>
+                <button class="btn btn-info" type="submit" onclick="find();">
+                    <i class="glyphicon glyphicon-search"></i>
+                </button>
+            </span>
+        </div>
+
         <table class="table table-striped table-hover">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Name</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var company in Model.OrderBy(o => o.Name))
-                {
-                    <tr>
-                        <td>@Html.ActionLink(company.Name, "Details", new { id = company.Id })</td>
-                    </tr>
-                }
-            </tbody>
+            <tbody id="table-body"></tbody>
         </table>
         @Html.ActionLink("Create company", "Create", "Companies", null, new { @class = "btn btn-primary" })
     </div>
