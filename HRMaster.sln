@@ -7,9 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRMasterASP", "src\HRMaster
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRMasterUnitTests", "tests\HRMasterUnitTests\HRMasterUnitTests.csproj", "{5A09F3BB-B98A-4DD7-98A2-A8700CFCD482}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRMasterUITests", "tests\HRMasterUITests\HRMasterUITests.csproj", "{156ACA2C-2723-4112-A045-D909BDDFFEEE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HRMasterIntegrationTests", "tests\HRMasterIntegrationTests\HRMasterIntegrationTests.csproj", "{7DEFDC74-0125-4BD6-9AE5-47C1A755B04A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HRMasterIntegrationTests", "tests\HRMasterIntegrationTests\HRMasterIntegrationTests.csproj", "{7DEFDC74-0125-4BD6-9AE5-47C1A755B04A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +23,6 @@ Global
 		{5A09F3BB-B98A-4DD7-98A2-A8700CFCD482}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A09F3BB-B98A-4DD7-98A2-A8700CFCD482}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A09F3BB-B98A-4DD7-98A2-A8700CFCD482}.Release|Any CPU.Build.0 = Release|Any CPU
-		{156ACA2C-2723-4112-A045-D909BDDFFEEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{156ACA2C-2723-4112-A045-D909BDDFFEEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{156ACA2C-2723-4112-A045-D909BDDFFEEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{156ACA2C-2723-4112-A045-D909BDDFFEEE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7DEFDC74-0125-4BD6-9AE5-47C1A755B04A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7DEFDC74-0125-4BD6-9AE5-47C1A755B04A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DEFDC74-0125-4BD6-9AE5-47C1A755B04A}.Release|Any CPU.ActiveCfg = Release|Any CPU
