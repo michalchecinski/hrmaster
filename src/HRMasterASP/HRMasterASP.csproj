@@ -5,6 +5,8 @@
     <ApplicationIcon />
     <Win32Resource />
     <UserSecretsId>182c6046-bf72-4fc8-97f2-98ce12db0841</UserSecretsId>
+    <ApplicationInsightsResourceId>/subscriptions/16cb9816-d009-477b-83cb-c8e84cbc5a19/resourcegroups/HRMaster/providers/microsoft.insights/components/hrmaster2018</ApplicationInsightsResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/16cb9816-d009-477b-83cb-c8e84cbc5a19/resourcegroups/HRMaster/providers/microsoft.insights/components/hrmaster2018</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -16,6 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Identity.Client" Version="2.5.0-preview" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="4.4.1" />
@@ -28,6 +31,10 @@
     <Content Update="Views\JobApplication\Edit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
   
 </Project>
