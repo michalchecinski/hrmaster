@@ -13,6 +13,7 @@
 
     $(document).ready(function () {
         $('#clear').hide();
+        $('#clear').on("click", clear);
         getAll();
     })
 
@@ -28,6 +29,7 @@
         query = $('#search').val();
         currentPage = 1;
         $('#clear').show();
+        $('#clear').on("click", clear);
         fetchData();
     }
 

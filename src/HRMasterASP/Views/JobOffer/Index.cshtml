@@ -33,6 +33,7 @@
             $(document).ready(function () {
                 $('#clear').hide();
                 getAll();
+                $('#clear').on("click", clear);
             })
 
 
@@ -50,6 +51,7 @@
                 query = $('#search').val();
                 currentPage = 1;
                 $('#clear').show();
+                $('#clear').on("click", clear);
                 fetchData();
             }
 
@@ -152,8 +154,8 @@
             <tbody id="table-body"></tbody>
         </table>
         @if ((bool)ViewData["IsAdmin"] == true) { 
-        @Html.ActionLink("Create job offer", "Create", "JobOffer", null, new { @class = "btn btn-primary" })
-            }
+            @Html.ActionLink("Create job offer", "Create", "JobOffer", null, new { @class = "btn btn-primary" })
+        }
     </div>
 </div>
 
