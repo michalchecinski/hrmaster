@@ -151,7 +151,9 @@
             </thead>
             <tbody id="table-body"></tbody>
         </table>
+        @if ((bool)ViewData["IsAdmin"] == true) { 
         @Html.ActionLink("Create job offer", "Create", "JobOffer", null, new { @class = "btn btn-primary" })
+            }
     </div>
 </div>
 

@@ -39,6 +39,7 @@ namespace HRMasterASP.Controllers
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery(Name = "search")] string searchString)
         {
+            ViewData["IsAdmin"] = await isUserAdminAsync();
             var jobOffers = await _context.JobOffers.ToListAsync();
 
             if (String.IsNullOrEmpty(searchString))
