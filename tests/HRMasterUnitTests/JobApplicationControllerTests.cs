@@ -16,7 +16,7 @@ namespace HRMasterUnitTests
     public class JobApplicationControllerTests
     {
         [Fact]
-        public async Task job_appliaction_create_valid_model_should_return_joboffer_details_pageAsync()
+        public async Task job_appliaction_create_valid_model_should_return_joboffer_details_page()
         {
             var mockRepo = new Mock<DataContext>();
             var mockConfig = new Mock<IConfiguration>();
