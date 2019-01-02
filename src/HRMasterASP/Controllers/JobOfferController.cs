@@ -50,8 +50,8 @@ namespace HRMasterASP.Controllers
         }
 
         [Authorize]
-        [HttpPost]
-        public async Task<ActionResult> Edit(int? id, JobOffer jobOffer)
+        [HttpGet]
+        public async Task<ActionResult> Edit(int? id)
         {
             if(!await isUserAdminAsync())
             {
@@ -59,10 +59,14 @@ namespace HRMasterASP.Controllers
             }
             if (id == null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            if (id != jobOffer.Id)
+
+            JobOffer jobOffer = await _context.JobOffers.FirstOrDefaultAsync(x => x.Id == id);
+            if (jobOffer == null)
             {
                 return NotFound();
             }
+
+            return View(jobOffer);
 
             if (ModelState.IsValid)
             {
@@ -96,12 +100,14 @@ namespace HRMasterASP.Controllers
             {
                 return RedirectToAction("NotAllowed", "Session");
             }
-            if (!ModelState.IsValid)
-            {
-                return View();
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    return View();
+            //}
             var offer = await _context.JobOffers.FirstOrDefaultAsync(j => j.Id == model.Id);
             offer.JobTitle = model.JobTitle;
+            offer.Description = model.Description;
+            await _context.SaveChangesAsync();
             return RedirectToAction("Details", new { id = model.Id });
         }
 
