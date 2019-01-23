@@ -100,10 +100,10 @@ namespace HRMasterASP.Controllers
             {
                 return RedirectToAction("NotAllowed", "Session");
             }
-            //if (!ModelState.IsValid)
-            //{
-            //    return View();
-            //}
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             var offer = await _context.JobOffers.FirstOrDefaultAsync(j => j.Id == model.Id);
             offer.JobTitle = model.JobTitle;
             offer.Description = model.Description;
